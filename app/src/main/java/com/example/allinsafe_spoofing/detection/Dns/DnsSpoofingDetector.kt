@@ -53,8 +53,14 @@ class DnsSpoofingDetector(
         }
 
         var failedChecks = 0
-        if (sourceIp !in trustedDnsServers) failedChecks++
 
+        // ✅ 1. TXID 요청-응답 매칭 검사
+        val expectedServer = pendingRequests[txid]
+        if (expectedServer == null || expectedServer != sourceIp) {
+            failedChecks++
+        }
+
+        // ✅ 2. TTL 값 검사
         val ttl = if (version == 4) {
             buffer.position(8)
             buffer.get().toInt() and 0xFF
@@ -62,11 +68,16 @@ class DnsSpoofingDetector(
             buffer.position(7)
             buffer.get().toInt() and 0xFF
         }
-        if (ttl < 10) failedChecks++
+        if (ttl < 10) {
+            failedChecks++
+        }
 
-        val expectedServer = pendingRequests[txid]
-        if (expectedServer == null || expectedServer != sourceIp) failedChecks++
+        // ✅ 3. 신뢰된 DNS 서버 검사
+        if (sourceIp !in trustedDnsServers) {
+            failedChecks++
+        }
 
+        // 중복 경고 방지
         if ((failedChecks == 2 || failedChecks == 3) && txid in warnedTxids) return
         if (failedChecks >= 2) warnedTxids.add(txid)
 
