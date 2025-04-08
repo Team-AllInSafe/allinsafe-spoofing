@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val alertManager = AlertManager()
-        val arpDetector = ArpSpoofingDetector()
+        val arpDetector = ArpSpoofingDetector(alertManager)
         val dnsDetector = DnsSpoofingDetector(alertManager)
 
         detectionManager = SpoofingDetectionManager(
