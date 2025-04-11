@@ -20,6 +20,8 @@ class CustomVpnService : VpnService() {
     private var detectionManager: SpoofingDetectionManager? = null
     private val buffer = ByteBuffer.allocate(32767)
 
+
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i("VPN", "VPN 서비스 시작 요청")
         startVpnSafely()
@@ -45,8 +47,11 @@ class CustomVpnService : VpnService() {
             vpnInterface = fd
             Log.i("VPN", "VPN 인터페이스 설정 완료")
 
+            // 1) AlertManager
             val alertManager = AlertManager()
-            val arpDetector = ArpSpoofingDetector()
+
+            // 2) ARP / DNS 디텍터 생성
+            val arpDetector = ArpSpoofingDetector(alertManager)
             val dnsDetector = DnsSpoofingDetector(alertManager)
 
             detectionManager = SpoofingDetectionManager(
@@ -54,6 +59,8 @@ class CustomVpnService : VpnService() {
                 dnsDetector = dnsDetector,
                 alertManager = alertManager
             )
+
+            startArpMonitoring()
 
             Handler(Looper.getMainLooper()).postDelayed({
                 if (vpnInterface != null) {
@@ -66,6 +73,19 @@ class CustomVpnService : VpnService() {
             Log.e("VPN", "VPN 시작 중 오류: ${e.message}")
             stopSelf()
         }
+    }
+
+
+    // ARP 모니터링 (3초 간격)
+    private fun startArpMonitoring() {
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = object : Runnable {
+            override fun run() {
+                detectionManager?.arpDetector?.checkArpTable()
+                handler.postDelayed(this, 3000)
+            }
+        }
+        handler.post(runnable)
     }
 
     private fun startPacketCapture() {
