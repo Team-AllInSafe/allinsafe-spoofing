@@ -33,9 +33,9 @@ class ArpSpoofingDetector(
         }
     }
 
-    // 시스템 접근 테스트
+
     fun checkArpTable() {
-        /*
+
         val newArpMap = readArpFile()
 
         for ((ip, newMac) in newArpMap) {
@@ -53,7 +53,7 @@ class ArpSpoofingDetector(
         // oldArpMap 업데이트
         oldArpMap.clear()
         oldArpMap.putAll(newArpMap)
-        */
+
     }
 
     /**
