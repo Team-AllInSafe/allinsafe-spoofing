@@ -20,7 +20,7 @@ import com.example.allinsafe_spoofing.vpn.CustomVpnService
 import com.example.allinsafe_spoofing.ui.theme.AllinSafe_SpoofingTheme
 
 class MainActivity : ComponentActivity() {
-
+    private lateinit var binding:Ac501
     private lateinit var detectionManager: SpoofingDetectionManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,21 +36,21 @@ class MainActivity : ComponentActivity() {
             alertManager = alertManager
         )
 
-        setContent {
-            AllinSafe_SpoofingTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    DetectionScreen(
-                        onStartDetection = { startVpnService() },
-                        onInjectDns = {
-                            DummyPacketInjector.injectDummyDnsPacket(detectionManager.dnsDetector)
-                        },
-                        onInjectArp = {
-                            DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)
-                        }
-                    )
-                }
-            }
-        }
+//        setContent { 기존 코드
+//            AllinSafe_SpoofingTheme {
+//                Surface(modifier = Modifier.fillMaxSize()) {
+//                    DetectionScreen(
+//                        onStartDetection = { startVpnService() },
+//                        onInjectDns = {
+//                            DummyPacketInjector.injectDummyDnsPacket(detectionManager.dnsDetector)
+//                        },
+//                        onInjectArp = {
+//                            DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)
+//                        }
+//                    )
+//                }
+//            }
+//        }
     }
 
     private fun startVpnService() {
