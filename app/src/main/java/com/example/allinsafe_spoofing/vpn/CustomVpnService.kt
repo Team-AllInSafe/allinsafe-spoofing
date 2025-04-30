@@ -49,7 +49,6 @@ class CustomVpnService : VpnService() {
 
             // 1) AlertManager
             val alertManager = AlertManager()
-
             // 2) ARP / DNS 디텍터 생성
             val arpDetector = ArpSpoofingDetector(alertManager)
             val dnsDetector = DnsSpoofingDetector(alertManager)
@@ -60,7 +59,7 @@ class CustomVpnService : VpnService() {
                 alertManager = alertManager
             )
 
-            startArpMonitoring()
+            //startArpMonitoring()
 
             Handler(Looper.getMainLooper()).postDelayed({
                 if (vpnInterface != null) {
@@ -76,7 +75,8 @@ class CustomVpnService : VpnService() {
     }
 
 
-    // ARP 모니터링 (3초 간격)
+    /*
+    루팅 후 가능한 arp 모니터링 기능
     private fun startArpMonitoring() {
         val handler = Handler(Looper.getMainLooper())
         val runnable = object : Runnable {
@@ -87,6 +87,7 @@ class CustomVpnService : VpnService() {
         }
         handler.post(runnable)
     }
+*/
 
     private fun startPacketCapture() {
         if (isCapturing) {

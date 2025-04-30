@@ -21,4 +21,7 @@ data class ArpData(
             }
         }
     }
+    override fun toString(): String {
+        return "ArpData(senderIp='$senderIp', senderMac='$senderMac', targetIp='$targetIp', targetMac='$targetMac')"
+    }
 }
