@@ -31,6 +31,10 @@ class MainActivity : ComponentActivity() {
         val arpDetector = ArpSpoofingDetector(alertManager)
         val dnsDetector = DnsSpoofingDetector(alertManager)
 
+        //dns, arp 더미 패킷을 삽입하기 위한 코드
+        var insertArpDummyPacket=false
+        var insertDnsDummyPacket=false
+
         detectionManager = SpoofingDetectionManager(
             arpDetector = arpDetector,
             dnsDetector = dnsDetector,
@@ -59,14 +63,22 @@ class MainActivity : ComponentActivity() {
         }
         binding.btnDetectStart.setOnClickListener {
             startVpnService()
+            if(insertArpDummyPacket){
+                DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)
+            }
+            if(insertDnsDummyPacket){
+                DummyPacketInjector.injectDummyDnsPacket(detectionManager.dnsDetector)
+            }
             var intent=Intent(this, Ac5_02_spoofingdetect_process::class.java)
             startActivity(intent)
         }
         binding.btnArpDummyPacket.setOnClickListener {
-            DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)
+            //DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)
+            insertArpDummyPacket=true
         }
         binding.btnDnsDummyPacket.setOnClickListener {
-            DummyPacketInjector.injectDummyDnsPacket(detectionManager.dnsDetector)
+            //DummyPacketInjector.injectDummyDnsPacket(detectionManager.dnsDetector)
+            insertDnsDummyPacket=true
         }
         binding.btnShowDetectHistory.setOnClickListener {
             var intent = Intent(this,Ac5_04_spoofingdetect_detect_history::class.java)
