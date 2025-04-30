@@ -1,8 +1,10 @@
+// ArpSpoofingDetector.kt
 package com.example.allinsafe_spoofing.detection.arpdetector
 
 import android.util.Log
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
+
 import com.example.allinsafe_spoofing.detection.common.LogManager
 import java.io.File
 
@@ -14,29 +16,36 @@ class ArpSpoofingDetector(
         private const val TAG = "ArpSpoofingDetector"
     }
 
+
     private val oldArpMap = mutableMapOf<String, String>()
     //val sdsManager= SpoofingDetectingStatusManager()
 
 
     //ARP 테이블을 주기적으로 읽어 IP->MAC 변화 확인
+    // 여러 IP에 대해 정상 MAC 매핑
+    private val knownMacTable = mapOf(
+        "192.168.78.1" to "00-50-56-f5-b8-cc",
+        "192.168.152.254" to "00-50-56-f2-ab-73"
+    )
+
 
     fun analyzePacket(arpData: ArpData): Boolean {
-        val realMac = "00-50-56-f5-b8-cc" // 정상 MAC
-        return if (arpData.senderMac != realMac) {
-            Log.e(TAG, "🔥 [탐지됨] ${arpData.senderIp}: MAC 변조 감지 (${arpData.senderMac})")
+        val expectedMac = knownMacTable[arpData.senderIp]
+
+        return if (expectedMac != null && arpData.senderMac != expectedMac) {
+            Log.e(TAG, "🔥 [탐지됨] ${arpData.senderIp}: 예상 MAC=$expectedMac, 수신 MAC=${arpData.senderMac}")
             alertManager.sendAlert(
                 severity = "CRITICAL",
                 title = "ARP 스푸핑 감지",
-                message = "IP: ${arpData.senderIp}, 기존 MAC: $realMac → 변조 MAC: ${arpData.senderMac}"
+                message = "IP: ${arpData.senderIp}, 예상 MAC: $expectedMac → 변조 MAC: ${arpData.senderMac}"
             )
             SpoofingDetectingStatusManager.arpSpoofingCompleted("CRITICAL")
             true
         } else {
-            Log.d(TAG, "[정상] ARP 패킷: ${arpData.senderIp}")
+            Log.d(TAG, "[정상] ARP 패킷: ${arpData.senderIp} (${arpData.senderMac})")
             false
         }
     }
-
 
     fun checkArpTable() {
 
@@ -91,3 +100,6 @@ class ArpSpoofingDetector(
         return arpMap
     }
 }
+=======
+}
+
