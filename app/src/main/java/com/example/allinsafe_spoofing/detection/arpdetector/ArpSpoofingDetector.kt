@@ -1,7 +1,9 @@
 package com.example.allinsafe_spoofing.detection.arpdetector
 
 import android.util.Log
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
+import com.example.allinsafe_spoofing.detection.common.LogManager
 import java.io.File
 
 
@@ -13,6 +15,7 @@ class ArpSpoofingDetector(
     }
 
     private val oldArpMap = mutableMapOf<String, String>()
+    //val sdsManager= SpoofingDetectingStatusManager()
 
 
     //ARP 테이블을 주기적으로 읽어 IP->MAC 변화 확인
@@ -26,6 +29,7 @@ class ArpSpoofingDetector(
                 title = "ARP 스푸핑 감지",
                 message = "IP: ${arpData.senderIp}, 기존 MAC: $realMac → 변조 MAC: ${arpData.senderMac}"
             )
+            SpoofingDetectingStatusManager.arpSpoofingCompleted("CRITICAL")
             true
         } else {
             Log.d(TAG, "[정상] ARP 패킷: ${arpData.senderIp}")
@@ -39,14 +43,17 @@ class ArpSpoofingDetector(
         val newArpMap = readArpFile()
 
         for ((ip, newMac) in newArpMap) {
+            SpoofingDetectingStatusManager.arpSpoofingCompleted("CRITICAL")
             val oldMac = oldArpMap[ip]
             if (oldMac != null && oldMac != newMac) {
-                Log.e(TAG, "[ARP SPOOFING DETECTED] $ip: $oldMac -> $newMac")
+                //Log.e(TAG, "[ARP SPOOFING DETECTED] $ip: $oldMac -> $newMac")
+                LogManager.log(TAG, "[ARP SPOOFING DETECTED] $ip: $oldMac -> $newMac")
                 alertManager.sendAlert(
                     severity = "CRITICAL",
                     title = "ARP 스푸핑 감지",
                     message = "IP=$ip, 기존MAC=$oldMac → 변조MAC=$newMac"
                 )
+
             }
         }
 
@@ -73,7 +80,8 @@ class ArpSpoofingDetector(
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "접근 권한 오류: ${e.message}")
+            //Log.e(TAG, "접근 권한 오류: ${e.message}")
+            LogManager.log(TAG, "접근 권한 오류: ${e.message}")
             alertManager.sendAlert(
                 severity = "WARNING",
                 title = "ARP 탐지 실패",

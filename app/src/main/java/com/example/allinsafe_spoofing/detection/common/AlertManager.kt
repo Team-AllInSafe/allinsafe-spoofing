@@ -3,8 +3,10 @@ package com.example.allinsafe_spoofing.detection.common
 import android.util.Log
 
 class AlertManager {
+
     fun sendAlert(severity: String, title: String, message: String) {
-        Log.e("AlertManager", "[$severity] $title -> $message")
+        //Log.e("AlertManager", "[$severity] $title -> $message")
+        LogManager.log("AlertManager", "[$severity] $title -> $message")
     }
 
     fun sendAlert(ip: String) {

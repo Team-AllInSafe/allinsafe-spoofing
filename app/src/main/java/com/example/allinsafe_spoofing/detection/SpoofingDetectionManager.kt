@@ -1,6 +1,7 @@
 package com.example.allinsafe_spoofing.detection
 
 import android.util.Log
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
 import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpData
@@ -24,6 +25,7 @@ class SpoofingDetectionManager(
                     title = "ARP 스푸핑 감지",
                     message = "IP: ${arpData!!.senderIp}, 기존 MAC: ??? → 변조된 MAC: ${arpData.senderMac}"
                 )
+                SpoofingDetectingStatusManager.arpSpoofingCompleted("CRITICAL")
             }
         }
 

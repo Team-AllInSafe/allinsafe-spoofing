@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.allinsafe_spoofing.classforui.MyApp
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.databinding.Ac501SpoofingdetectInitMainBinding
 import com.example.allinsafe_spoofing.detection.SpoofingDetectionManager
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
@@ -35,6 +37,12 @@ class MainActivity : ComponentActivity() {
         var insertArpDummyPacket=false
         var insertDnsDummyPacket=false
 
+        //dns, arp 탐지 과정을 위한 코드
+//        val app = application as AppClass
+//        val sdsManager = (application as SpoofingDetectingStatusManager).also {
+//            it.init(this) //이게 적용이 안 되는거같은데, 왠지 모르겠음
+//        }
+
         detectionManager = SpoofingDetectionManager(
             arpDetector = arpDetector,
             dnsDetector = dnsDetector,
@@ -56,6 +64,8 @@ class MainActivity : ComponentActivity() {
 //                }
 //            }
 //        }
+        val app=application as MyApp
+        SpoofingDetectingStatusManager.init(this)
         binding=Ac501SpoofingdetectInitMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.backButton.setOnClickListener {
@@ -69,8 +79,13 @@ class MainActivity : ComponentActivity() {
             if(insertDnsDummyPacket){
                 DummyPacketInjector.injectDummyDnsPacket(detectionManager.dnsDetector)
             }
-            var intent=Intent(this, Ac5_02_spoofingdetect_process::class.java)
-            startActivity(intent)
+            if(SpoofingDetectingStatusManager.getIsCompletedPageStart()==false){
+                //더미 패킷을 통해 스푸핑을 감지하면 너무 결과창이 빨리 나와 진행중 페이지에 덮여버리는것을 막는 조건문입니다.
+                var intent=Intent(this, Ac5_02_spoofingdetect_process::class.java)
+                startActivity(intent)
+                //finish() //필요한지 모르겟음
+        }
+
         }
         binding.btnArpDummyPacket.setOnClickListener {
             //DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)

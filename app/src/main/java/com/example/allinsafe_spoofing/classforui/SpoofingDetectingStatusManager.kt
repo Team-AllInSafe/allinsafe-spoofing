@@ -1,57 +1,56 @@
 package com.example.allinsafe_spoofing.classforui
 
-import android.app.Application
 import android.content.Context
 import android.content.Intent
-import com.example.allinsafe_spoofing.Ac5_02_spoofingdetect_process
+import android.util.Log
+import android.widget.Toast
 import com.example.allinsafe_spoofing.Ac5_03_spoofoingdetect_completed
 
-class SpoofingDetectingStatusManager(private val context: Context) {
+object SpoofingDetectingStatusManager {
     private var arpSpoofDetectResult=SpoofDetectResult("Arp",0,"","","")
     private var dnsSpoofDetectResult=SpoofDetectResult("Dns",0,"","","")
+    private lateinit var context:Context
+    private var isCompletedPageStart=false
     //나중에 더 확장해야겠지만 지금은 이것만 넣겠습니다.
+    fun init(context: Context){
+        this.context =context
+    }
     fun arpSpoofingCompleted(severity: String){
+        Log.d("ui","ARP 스푸핑 완료됨")
         arpSpoofDetectResult.setType("Arp")
         arpSpoofDetectResult.setStatus(2)
         arpSpoofDetectResult.setSeverity(severity)
         checkIfAllCompleted()
     }
     fun dnsSpoofingCompleted(severity: String){
-        dnsSpoofDetectResult.setType("Arp")
+        Log.d("ui","DNS 스푸핑 완료됨")
+        dnsSpoofDetectResult.setType("Dns")
         dnsSpoofDetectResult.setStatus(2)
         dnsSpoofDetectResult.setSeverity(severity)
         checkIfAllCompleted()
     }
     private fun checkIfAllCompleted() {
         if (arpSpoofDetectResult.getStatus() == 2 && dnsSpoofDetectResult.getStatus() == 2) {
+            Log.d("ui","스푸핑 둘 다 완료됨")
             // 두 탐지 모두 완료됨 -> 다음 액티비티로 이동
             val intent = Intent(context, Ac5_03_spoofoingdetect_completed::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // context가 Activity가 아닐 수 있으므로
+            completedPageStart()
             context.startActivity(intent)
+            Log.d("ui","503액티비티 출력")
         }
     }
-
-}
-
-class SpoofDetectResult( type:String, status:Int,severity: String, title: String, message: String){
-    //status:
-    //0 : 시작전
-    //1 : 동작중
-    //2 : 완료
-    private var type=type
-    private var status=status
-    private var severity=severity
-    private var title=title
-    private var message=message
-
-    fun init(type:String, status:Int,severity: String, title: String, message: String){init(type, status,severity, title, message)}
-
-    override fun equals(other: Any?): Boolean {
-        return super.equals(other)
+    fun completedPageStart(){
+        isCompletedPageStart=true
     }
-    fun setType(type:String){setType(type)} //왜 이걸 해야하는지는 모르겠음.
-    fun setStatus(status:Int){setStatus(status)}
-    fun setSeverity(severity: String){setSeverity(severity)}
-
-    fun getStatus(): Int {return status}
+    fun getIsCompletedPageStart(): Boolean{
+        return isCompletedPageStart
+    }
+    fun getArpSeverity():String{
+        return arpSpoofDetectResult.getSeverity()
+    }
+    fun getDnsSeverity():String{
+        return dnsSpoofDetectResult.getSeverity()
+    }
 }
+

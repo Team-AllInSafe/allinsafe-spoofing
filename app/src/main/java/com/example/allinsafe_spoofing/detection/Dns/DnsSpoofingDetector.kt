@@ -2,7 +2,9 @@ package com.example.allinsafe_spoofing.detection.dns
 
 import android.util.Log
 import com.example.allinsafe_spoofing.Ac5_02_spoofingdetect_process
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
+import com.example.allinsafe_spoofing.detection.common.LogManager
 import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap
 
@@ -86,16 +88,34 @@ class DnsSpoofingDetector(
     }
 
     private fun logResult(sourceIp: String, txid: Int, failedChecks: Int) {
+        SpoofingDetectingStatusManager.dnsSpoofingCompleted("severity")
+//        when (failedChecks) {
+//            0, 1 -> Log.d(TAG, "[OK] 정상적인 DNS 응답 (출처: $sourceIp, TXID: $txid)")
+//            2 -> {
+//                Log.w(TAG, "[WARNING] DNS 스푸핑 의심 (출처: $sourceIp, TXID: $txid)")
+//                alertManager.sendAlert("WARNING", "DNS 스푸핑 의심", "출처: $sourceIp, TXID: $txid")
+//            }
+//            3 -> {
+//                Log.e(TAG, "[CRITICAL] 🚨🚨 DNS 스푸핑 감지 (출처: $sourceIp, TXID: $txid)")
+//                alertManager.sendAlert("CRITICAL", "DNS 스푸핑 감지", "출처: $sourceIp, TXID: $txid")
+//            }
+//
+//        }
         when (failedChecks) {
-            0, 1 -> Log.d(TAG, "[OK] 정상적인 DNS 응답 (출처: $sourceIp, TXID: $txid)")
+            0, 1 -> {LogManager.log(TAG, "[OK] 정상적인 DNS 응답 (출처: $sourceIp, TXID: $txid)")
+                SpoofingDetectingStatusManager.dnsSpoofingCompleted("OK")}
             2 -> {
-                Log.w(TAG, "[WARNING] DNS 스푸핑 의심 (출처: $sourceIp, TXID: $txid)")
+                LogManager.log(TAG, "[WARNING] DNS 스푸핑 의심 (출처: $sourceIp, TXID: $txid)")
                 alertManager.sendAlert("WARNING", "DNS 스푸핑 의심", "출처: $sourceIp, TXID: $txid")
+                SpoofingDetectingStatusManager.dnsSpoofingCompleted("WARNING")
             }
             3 -> {
-                Log.e(TAG, "[CRITICAL] 🚨🚨 DNS 스푸핑 감지 (출처: $sourceIp, TXID: $txid)")
+                LogManager.log(TAG, "[CRITICAL] 🚨🚨 DNS 스푸핑 감지 (출처: $sourceIp, TXID: $txid)")
                 alertManager.sendAlert("CRITICAL", "DNS 스푸핑 감지", "출처: $sourceIp, TXID: $txid")
+                SpoofingDetectingStatusManager.dnsSpoofingCompleted("CRITICAL")
             }
+
         }
+        //SpoofingDetectingStatusManager.dnsSpoofingCompleted("severity")
     }
 }

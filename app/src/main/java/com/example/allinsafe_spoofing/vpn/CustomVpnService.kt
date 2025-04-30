@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.VpnService
 import android.os.*
 import android.util.Log
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.databinding.Ac502SpoofingdetectProcessBinding
 import com.example.allinsafe_spoofing.detection.SpoofingDetectionManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
@@ -16,7 +17,6 @@ class CustomVpnService : VpnService() {
     private var vpnInterface: ParcelFileDescriptor? = null
     private var packetCaptureThread: Thread? = null
     private var isCapturing = false
-
     private var detectionManager: SpoofingDetectionManager? = null
     private val buffer = ByteBuffer.allocate(32767)
 

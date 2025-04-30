@@ -14,11 +14,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewbinding.ViewBinding
 import com.example.allinsafe_spoofing.databinding.Ac502SpoofingdetectProcessBinding
+import com.example.allinsafe_spoofing.detection.common.LogManager
+import java.util.logging.Logger
 
 class Ac5_02_spoofingdetect_process : ComponentActivity() {
     private lateinit var binding: Ac502SpoofingdetectProcessBinding
-    private var isArpSpoofingCompleted=false
-    private var isDnsSpoofingCompleted=false
+//    private var isArpSpoofingCompleted=false
+//    private var isDnsSpoofingCompleted=false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding=Ac502SpoofingdetectProcessBinding.inflate(layoutInflater)
@@ -32,20 +34,32 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
         binding.progressbar.setProgress(1)
         binding.textviewProcess.text="검사중..."
 
+//        while(true){
+//            val logs = LogManager.getLogs()
+//            val logText = logs.joinToString("\n")
+//            binding.textviewProcess.text = logText
+//            Thread.sleep(1000)
+//        }
+    val logs = LogManager.getLogs()
+    val logText = logs.joinToString("\n")
+    binding.textviewProcess.text = logText
+    Thread.sleep(1000)
 
-    }
-    fun updateActivityStatus(activityName: String) {
-        when (activityName) {
-            "Arp" -> isArpSpoofingCompleted = true
-            "Dns" -> isDnsSpoofingCompleted = true
-        }
 
-        // 두 액티비티가 모두 종료되었으면 다음 화면으로 이동
-        if (isArpSpoofingCompleted && isDnsSpoofingCompleted) {
-            startActivity(Intent(this, Ac5_03_spoofoingdetect_completed::class.java))
-            finish()  // 현재 액티비티 종료
-        }
-    }
+
+}
+//    fun updateActivityStatus(activityName: String) {
+//        when (activityName) {
+//            "Arp" -> isArpSpoofingCompleted = true
+//            "Dns" -> isDnsSpoofingCompleted = true
+//        }
+//
+//        // 두 액티비티가 모두 종료되었으면 다음 화면으로 이동
+//        if (isArpSpoofingCompleted && isDnsSpoofingCompleted) {
+//            startActivity(Intent(this, Ac5_03_spoofoingdetect_completed::class.java))
+//            finish()  // 현재 액티비티 종료
+//        }
+//    }
     fun detect_com0plete(binding:Ac502SpoofingdetectProcessBinding){
         //실제 스푸핑 코드와 연동하였을때 사용하기 위한 함수
         //Toast.makeText(this.applicationContext,"스푸핑 탐지가 완료되었습니다!",Toast.LENGTH_LONG).show()
