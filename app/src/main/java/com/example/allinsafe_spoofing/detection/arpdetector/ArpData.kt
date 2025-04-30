@@ -11,10 +11,16 @@ data class ArpData(
     companion object {
         fun fromPacket(packet: ByteArray): ArpData? {
             return try {
-                val senderIp = InetAddress.getByAddress(packet.copyOfRange(28, 32)).hostAddress
-                val senderMac = packet.copyOfRange(22, 28).joinToString(":") { "%02X".format(it) }
-                val targetIp = InetAddress.getByAddress(packet.copyOfRange(38, 42)).hostAddress
-                val targetMac = packet.copyOfRange(32, 38).joinToString(":") { "%02X".format(it) }
+                if (packet.size < 42) return null // 최소 길이 검사
+
+                val senderIp = InetAddress.getByAddress(packet.copyOfRange(28, 32)).hostAddress ?: return null
+                val senderMac = packet.copyOfRange(22, 28)
+                    .joinToString(":") { "%02X".format(it) }.lowercase()
+
+                val targetIp = InetAddress.getByAddress(packet.copyOfRange(38, 42)).hostAddress ?: return null
+                val targetMac = packet.copyOfRange(32, 38)
+                    .joinToString(":") { "%02X".format(it) }.lowercase()
+
                 ArpData(senderIp, senderMac, targetIp, targetMac)
             } catch (e: Exception) {
                 null
@@ -22,6 +28,6 @@ data class ArpData(
         }
     }
     override fun toString(): String {
-        return "ArpData(senderIp='$senderIp', senderMac='$senderMac', targetIp='$targetIp', targetMac='$targetMac')"
+        return "[ARP] $senderIp → $targetIp | $senderMac → $targetMac"
     }
 }
