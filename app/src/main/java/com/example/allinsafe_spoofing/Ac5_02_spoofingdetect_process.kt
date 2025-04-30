@@ -1,5 +1,6 @@
 package com.example.allinsafe_spoofing
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -52,6 +53,7 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
         startActivity(intent)
     }
 }
+
 fun tempDetect_for10sec(binding: Ac502SpoofingdetectProcessBinding,onFinished: () -> Unit): Unit{
     //프로그레스바에 대한 임시 함수로, 10초간 탐지(하는것처럼 보인) 후 다음 화면으로 넘어갑니다.
     var i = 1
