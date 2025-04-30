@@ -8,13 +8,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.allinsafe_spoofing.R
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.databinding.Ac503SpoofingdetectCompletedBinding
 
 class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
     private lateinit var binding: Ac503SpoofingdetectCompletedBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding=Ac503SpoofingdetectCompletedBinding.inflate(layoutInflater)
+        binding = Ac503SpoofingdetectCompletedBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
 //        //ui확인을 위한 임시 부분임
@@ -51,10 +52,22 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
             finish()
         }
         binding.btnShowDetectHistory.setOnClickListener {
-            var intent=Intent(this,Ac5_04_spoofingdetect_detect_history::class.java)
+            var intent = Intent(this, Ac5_04_spoofingdetect_detect_history::class.java)
             startActivity(intent)
         }
-
+        if (SpoofingDetectingStatusManager.getArpSeverity() == "CRITICAL"
+            || SpoofingDetectingStatusManager.getArpSeverity()=="WARNING") {
+            set_arp_abnormal(binding)
+        } else {
+            set_arp_normal(binding)
+        }
+        if (SpoofingDetectingStatusManager.getDnsSeverity() == "CRITICAL"
+            || SpoofingDetectingStatusManager.getDnsSeverity() == "WARNING") {
+            set_dns_abnormal(binding)
+        }
+        else{
+            set_dns_normal(binding)
+        }
     }
     fun set_arp_normal(binding: Ac503SpoofingdetectCompletedBinding){
         binding.arpBg.background = ContextCompat.getDrawable(binding.root.context, R.drawable.btn_round_green)
