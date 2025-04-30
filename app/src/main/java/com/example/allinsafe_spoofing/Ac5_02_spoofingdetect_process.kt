@@ -25,9 +25,9 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
         binding.backButton.setOnClickListener {
             finish()
         }
-//        tempDetect_for10sec(binding){
-//            detect_complete(binding)
-//        }
+        tempDetect_for10sec(binding){
+            detect_complete(binding)
+        }
         binding.progressbar.setProgress(1)
         binding.textviewProcess.text="검사중..."
 
@@ -45,7 +45,7 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
             finish()  // 현재 액티비티 종료
         }
     }
-    fun detect_com0plete(binding:Ac502SpoofingdetectProcessBinding){
+    fun detect_complete(binding:Ac502SpoofingdetectProcessBinding){
         //실제 스푸핑 코드와 연동하였을때 사용하기 위한 함수
         //Toast.makeText(this.applicationContext,"스푸핑 탐지가 완료되었습니다!",Toast.LENGTH_LONG).show()
         var intent=Intent(this,Ac5_03_spoofoingdetect_completed::class.java)
@@ -58,7 +58,7 @@ fun tempDetect_for10sec(binding: Ac502SpoofingdetectProcessBinding,onFinished: (
     val handler = Handler(Looper.getMainLooper())
     val runnable = object : Runnable {
         override fun run() {
-            if (i <= 10) {
+            if (i <= 5) {
                 binding.progressbar.setProgress(10)
                 binding.textviewProcess.text = "${i}초"
                 i += 1

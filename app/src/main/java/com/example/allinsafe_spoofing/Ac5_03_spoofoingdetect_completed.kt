@@ -18,33 +18,33 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
         setContentView(binding.root)
 
 //        //ui확인을 위한 임시 부분임
-//        set_arp_normal(binding)
-//        set_dns_normal(binding)
-//        var arp_isnormal=true
-//        var dns_isnormal=true
-//        binding.arpBg.setOnClickListener {
-//            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
-//            if(arp_isnormal){
-//                arp_isnormal=false
-//                set_arp_abnormal(binding)
-//            }
-//            else{
-//                arp_isnormal=true
-//                set_arp_normal(binding)
-//            }
-//
-//        }
-//        binding.dnsView.setOnClickListener {
-//            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
-//            if(dns_isnormal){
-//                dns_isnormal=false
-//                set_dns_abnormal(binding)
-//            }
-//            else{
-//                dns_isnormal=true
-//                set_dns_normal(binding)
-//            }
-//        }
+        set_arp_normal(binding)
+        set_dns_normal(binding)
+        var arp_isnormal=true
+        var dns_isnormal=true
+        binding.arpBg.setOnClickListener {
+            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
+            if(arp_isnormal){
+                arp_isnormal=false
+                set_arp_abnormal(binding)
+            }
+            else{
+                arp_isnormal=true
+                set_arp_normal(binding)
+            }
+
+        }
+        binding.dnsView.setOnClickListener {
+            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
+            if(dns_isnormal){
+                dns_isnormal=false
+                set_dns_abnormal(binding)
+            }
+            else{
+                dns_isnormal=true
+                set_dns_normal(binding)
+            }
+        }
 //        //ui확인을 위한 임시 부분임
 
         binding.backButton.setOnClickListener {
