@@ -15,6 +15,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.viewbinding.ViewBinding
 import com.example.allinsafe_spoofing.databinding.Ac502SpoofingdetectProcessBinding
 import com.example.allinsafe_spoofing.detection.common.LogManager
+import com.example.allinsafe_spoofing.detection.packettest.DummyPacketInjector
 import java.util.logging.Logger
 
 class Ac5_02_spoofingdetect_process : ComponentActivity() {
@@ -28,12 +29,17 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
         binding.backButton.setOnClickListener {
             finish()
         }
-        tempDetect_for10sec(binding){
-            detect_complete(binding)
-        }
+//        tempDetect_for10sec(binding){
+//            detect_complete(binding)
+//        }
         binding.progressbar.setProgress(1)
         binding.textviewProcess.text="검사중..."
-
+        binding.btnArpDummyPacket.setOnClickListener {
+            DummyPacketInjector.injectDummyArpData()
+        }
+        binding.btnDnsDummyPacket.setOnClickListener {
+            DummyPacketInjector.injectDummyDnsPacket()
+        }
 //        while(true){
 //            val logs = LogManager.getLogs()
 //            val logText = logs.joinToString("\n")
@@ -61,14 +67,6 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
 //            finish()  // 현재 액티비티 종료
 //        }
 //    }
-    fun detect_complete(binding:Ac502SpoofingdetectProcessBinding){
-
-        // 두 액티비티가 모두 종료되었으면 다음 화면으로 이동
-        if (isArpSpoofingCompleted && isDnsSpoofingCompleted) {
-            startActivity(Intent(this, Ac5_03_spoofoingdetect_completed::class.java))
-            finish()  // 현재 액티비티 종료
-        }
-    }
     fun detect_complete(binding:Ac502SpoofingdetectProcessBinding){
 
         //실제 스푸핑 코드와 연동하였을때 사용하기 위한 함수

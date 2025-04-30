@@ -72,6 +72,10 @@ class MainActivity : ComponentActivity() {
             finish()
         }
         binding.btnDetectStart.setOnClickListener {
+            //탐지중 패킷 추가 위한 작업
+            DummyPacketInjector.arp_init(detectionManager.arpDetector)
+            DummyPacketInjector.dns_init(detectionManager.dnsDetector)
+
             startVpnService()
             if(insertArpDummyPacket){
                 DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)

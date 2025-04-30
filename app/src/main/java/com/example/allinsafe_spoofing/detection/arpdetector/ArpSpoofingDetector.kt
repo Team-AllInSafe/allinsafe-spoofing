@@ -100,6 +100,3 @@ class ArpSpoofingDetector(
         return arpMap
     }
 }
-=======
-}
-
