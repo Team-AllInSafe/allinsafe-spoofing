@@ -18,11 +18,11 @@ class SpoofingDetectionManager(
         if (isArpPacket(buffer)) {
             val arpData = ArpData.fromPacket(packetData)
             val isSpoofed = arpData != null && arpDetector.analyzePacket(arpData)
-            if (isSpoofed) {
+            if (isSpoofed && arpData != null) {
                 alertManager.sendAlert(
                     severity = "CRITICAL",
                     title = "ARP 스푸핑 감지",
-                    message = "IP: ${arpData!!.senderIp}, 기존 MAC: ??? → 변조된 MAC: ${arpData.senderMac}"
+                    message = "IP: ${arpData.senderIp}, 변조된 MAC: ${arpData.senderMac}"
                 )
             }
         }
@@ -43,7 +43,6 @@ class SpoofingDetectionManager(
             false
         }
     }
-
     private fun isDnsPacket(buffer: ByteBuffer): Boolean {
         return try {
             buffer.rewind()
