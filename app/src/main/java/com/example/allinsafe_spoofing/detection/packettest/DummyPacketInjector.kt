@@ -59,9 +59,8 @@ object DummyPacketInjector {
             targetIp = "192.168.152.254",
             targetMac = "00-50-56-f5-b8-cc"
         )
-
         detector.analyzePacket(dummyArp)
     }
 
-}
+}//
 
