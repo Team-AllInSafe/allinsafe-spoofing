@@ -17,7 +17,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    viewBinding{enable=true}
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -53,6 +53,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation(libs.androidx.recyclerview)
 
     // 테스트 관련
     testImplementation(libs.junit)

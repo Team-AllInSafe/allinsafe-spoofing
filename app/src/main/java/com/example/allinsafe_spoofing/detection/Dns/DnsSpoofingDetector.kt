@@ -1,6 +1,7 @@
 package com.example.allinsafe_spoofing.detection.dns
 
 import android.util.Log
+import com.example.allinsafe_spoofing.Ac5_02_spoofingdetect_process
 import com.example.allinsafe_spoofing.detection.common.AlertManager
 import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap

@@ -31,7 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity android:name=".Ac5_02_spoofingdetect_process"
+            android:exported="false"/>
+        <activity android:name=".Ac5_03_spoofoingdetect_completed"
+            android:exported="false"/>
+        <activity android:name=".Ac5_04_spoofingdetect_detect_history"
+            android:exported="false"/>
         <!-- ✅ VpnService 등록 -->
         <service
             android:name=".vpn.CustomVpnService"
