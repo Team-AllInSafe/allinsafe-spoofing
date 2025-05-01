@@ -3,6 +3,7 @@ package com.example.allinsafe_spoofing.detection.packettest
 import android.util.Log
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpData
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
+import com.example.allinsafe_spoofing.detection.common.LogManager
 import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import java.nio.ByteBuffer
 
@@ -19,7 +20,8 @@ object DummyPacketInjector {
     }
     // 🔹 DNS 더미 패킷 삽입
     fun injectDummyDnsPacket(detector: DnsSpoofingDetector) {
-        Log.d(TAG, "🚀 테스트용 더미 DNS 패킷 삽입...")
+        //Log.d(TAG, "🚀 테스트용 더미 DNS 패킷 삽입...")
+        LogManager.log(TAG, "🚀 테스트용 더미 DNS 패킷 삽입...")
         detector.pendingRequests[0] = "8.8.8.8"  // 테스트용 요청 IP
 
         val dummyBuffer = ByteBuffer.allocate(60)
@@ -58,7 +60,8 @@ object DummyPacketInjector {
 
     // 🔹 ARP 더미 패킷 삽입
     fun injectDummyArpData(detector: ArpSpoofingDetector) {
-        Log.d(TAG, "🧪 테스트용 더미 ARP 데이터 삽입...")
+        //Log.d(TAG, "🧪 테스트용 더미 ARP 데이터 삽입...")
+        LogManager.log(TAG, "🧪 테스트용 더미 ARP 데이터 삽입...")
 
         val dummyArp = ArpData(
             senderIp = "192.168.78.1",
@@ -71,7 +74,8 @@ object DummyPacketInjector {
 
     //🔹 DNS 더미 패킷 삽입-detector없는 버전
     fun injectDummyDnsPacket() {
-        Log.d(TAG, "🚀 테스트용 더미 DNS 패킷 삽입...")
+        //Log.d(TAG, "🚀 테스트용 더미 DNS 패킷 삽입...")
+        LogManager.log(TAG, "🚀 테스트용 더미 DNS 패킷 삽입...")
         dns_detector.pendingRequests[0] = "8.8.8.8"  // 테스트용 요청 IP
 
         val dummyBuffer = ByteBuffer.allocate(60)
@@ -109,8 +113,8 @@ object DummyPacketInjector {
     }
     // 🔹 ARP 더미 패킷 삽입-detector없는 버전
     fun injectDummyArpData() {
-        Log.d(TAG, "🧪 테스트용 더미 ARP 데이터 삽입...")
-
+        //Log.d(TAG, "🧪 테스트용 더미 ARP 데이터 삽입...")
+        LogManager.log(TAG, "🚀 테스트용 더미 ARP 패킷 삽입...")
         val dummyArp = ArpData(
             senderIp = "192.168.78.1",
             senderMac = "00-11-22-33-44-66",

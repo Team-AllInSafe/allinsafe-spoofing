@@ -10,6 +10,7 @@ import com.example.allinsafe_spoofing.detection.SpoofingDetectionManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
 import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
+import com.example.allinsafe_spoofing.detection.common.LogManager
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 
@@ -23,7 +24,8 @@ class CustomVpnService : VpnService() {
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i("VPN", "VPN 서비스 시작 요청")
+        //Log.i("VPN", "VPN 서비스 시작 요청")
+        LogManager.log("VPN", "VPN 서비스 시작 요청")
         startVpnSafely()
         return START_STICKY
     }
@@ -39,13 +41,15 @@ class CustomVpnService : VpnService() {
                 .establish()
 
             if (fd == null) {
-                Log.e("VPN", "VPN 인터페이스 생성 실패")
+                //Log.e("VPN", "VPN 인터페이스 생성 실패")
+                LogManager.log("VPN", "VPN 인터페이스 생성 실패")
                 stopSelf()
                 return
             }
 
             vpnInterface = fd
-            Log.i("VPN", "VPN 인터페이스 설정 완료")
+            //Log.i("VPN", "VPN 인터페이스 설정 완료")
+            LogManager.log("VPN", "VPN 인터페이스 설정 완료")
 
             // 1) AlertManager
             val alertManager = AlertManager()
@@ -63,13 +67,15 @@ class CustomVpnService : VpnService() {
 
             Handler(Looper.getMainLooper()).postDelayed({
                 if (vpnInterface != null) {
-                    Log.i("VPN", "인터페이스 안정화 완료, 패킷 캡처 시작")
+                    //Log.i("VPN", "인터페이스 안정화 완료, 패킷 캡처 시작")
+                    LogManager.log("VPN", "인터페이스 안정화 완료, 패킷 캡처 시작")
                     startPacketCapture()
                 }
             }, 300)
 
         } catch (e: Exception) {
-            Log.e("VPN", "VPN 시작 중 오류: ${e.message}")
+            //Log.e("VPN", "VPN 시작 중 오류: ${e.message}")
+            LogManager.log("VPN", "VPN 시작 중 오류: ${e.message}")
             stopSelf()
         }
     }
@@ -91,7 +97,8 @@ class CustomVpnService : VpnService() {
 
     private fun startPacketCapture() {
         if (isCapturing) {
-            Log.w("VPN", "이미 캡처 중")
+            //Log.w("VPN", "이미 캡처 중")
+            LogManager.log("VPN", "이미 캡처 중")
             return
         }
         isCapturing = true
@@ -100,7 +107,8 @@ class CustomVpnService : VpnService() {
             try {
                 val fd = vpnInterface?.fileDescriptor ?: return@Thread
                 val inputStream = FileInputStream(fd)
-                Log.i("VPN", "패킷 캡처 스레드 시작")
+                //Log.i("VPN", "패킷 캡처 스레드 시작")
+                LogManager.log("VPN", "패킷 캡처 스레드 시작")
 
                 while (isCapturing) {
                     val length = inputStream.read(buffer.array())
@@ -110,7 +118,8 @@ class CustomVpnService : VpnService() {
                     }
                 }
             } catch (e: Exception) {
-                Log.e("VPN", "캡처 중 오류: ${e.message}")
+                //Log.e("VPN", "캡처 중 오류: ${e.message}")
+                LogManager.log("VPN", "캡처 중 오류: ${e.message}")
             }
         }
         packetCaptureThread?.start()
@@ -126,13 +135,15 @@ class CustomVpnService : VpnService() {
         stopPacketCapture()
         vpnInterface?.close()
         vpnInterface = null
-        Log.i("VPN", "VPN 인터페이스 종료")
+        //Log.i("VPN", "VPN 인터페이스 종료")
+        LogManager.log("VPN", "VPN 인터페이스 종료")
     }
 
     override fun onDestroy() {
         super.onDestroy()
         stopVpn()
-        Log.i("VPN", "VPN 서비스 종료")
+        //Log.i("VPN", "VPN 서비스 종료")
+        LogManager.log("VPN", "VPN 서비스 종료")
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
