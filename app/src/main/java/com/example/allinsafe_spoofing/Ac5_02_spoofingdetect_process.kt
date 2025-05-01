@@ -6,14 +6,20 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.example.allinsafe_spoofing.databinding.Ac502SpoofingdetectProcessBinding
+import com.example.allinsafe_spoofing.databinding.Ac506SpofingdetectItemLogBinding
 import com.example.allinsafe_spoofing.detection.common.LogManager
 import com.example.allinsafe_spoofing.detection.packettest.DummyPacketInjector
 import java.util.logging.Logger
@@ -22,8 +28,13 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
     private lateinit var binding: Ac502SpoofingdetectProcessBinding
 //    private var isArpSpoofingCompleted=false
 //    private var isDnsSpoofingCompleted=false
+    companion object{
+        // MainActivity 타입의 객체를 동반 객체로 선언한다(자바에서는 static)
+        var activity502 : Ac5_02_spoofingdetect_process? = null
+}
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activity502=this
         binding=Ac502SpoofingdetectProcessBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.backButton.setOnClickListener {
@@ -33,23 +44,27 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
 //            detect_complete(binding)
 //        }
         binding.progressbar.setProgress(1)
-        binding.textviewProcess.text="검사중..."
+//      binding.textviewProcess.text="검사중..."
+        val adapter =LogViewAdapter(LogManager.getLogs())
+        binding.recyclerLog.adapter=adapter
         binding.btnArpDummyPacket.setOnClickListener {
             DummyPacketInjector.injectDummyArpData()
         }
         binding.btnDnsDummyPacket.setOnClickListener {
             DummyPacketInjector.injectDummyDnsPacket()
         }
+
+    //텍스트뷰에 로그 받아오기 위한 코드(다신 쓸 일 없음)
 //        while(true){
 //            val logs = LogManager.getLogs()
 //            val logText = logs.joinToString("\n")
 //            binding.textviewProcess.text = logText
 //            Thread.sleep(1000)
 //        }
-    val logs = LogManager.getLogs()
-    val logText = logs.joinToString("\n")
-    binding.textviewProcess.text = logText
-    Thread.sleep(1000)
+//    val logs = LogManager.getLogs()
+//    val logText = logs.joinToString("\n")
+//    //binding.textviewProcess.text = logText
+//    Thread.sleep(1000)
 
 
 
@@ -75,24 +90,40 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
         startActivity(intent)
     }
 }
+class LogViewHolder(var binding: Ac506SpofingdetectItemLogBinding): RecyclerView.ViewHolder(binding.root)
+class LogViewAdapter(private val LogList: List<String>) :
+RecyclerView.Adapter<LogViewHolder>() {
 
-fun tempDetect_for10sec(binding: Ac502SpoofingdetectProcessBinding,onFinished: () -> Unit): Unit{
-    //프로그레스바에 대한 임시 함수로, 10초간 탐지(하는것처럼 보인) 후 다음 화면으로 넘어갑니다.
-    var i = 1
-    val handler = Handler(Looper.getMainLooper())
-    val runnable = object : Runnable {
-        override fun run() {
-            if (i <= 5) {
-                binding.progressbar.setProgress(10)
-                binding.textviewProcess.text = "${i}초"
-                i += 1
-                handler.postDelayed(this, 1000) // 1초 후 다시 실행
-            }
-            else{
-                onFinished()
-            }
-        }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
+        val binding=Ac506SpofingdetectItemLogBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        return LogViewHolder(binding)
     }
-    handler.post(runnable) // 최초 실행
+
+    override fun getItemCount(): Int = LogList.size
+
+    override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
+        val log=LogList[position]
+        holder.binding.recyclerLog.text=log
+    }
 }
+
+//fun tempDetect_for10sec(binding: Ac502SpoofingdetectProcessBinding,onFinished: () -> Unit): Unit{
+//    //프로그레스바에 대한 임시 함수로, 10초간 탐지(하는것처럼 보인) 후 다음 화면으로 넘어갑니다.
+//    var i = 1
+//    val handler = Handler(Looper.getMainLooper())
+//    val runnable = object : Runnable {
+//        override fun run() {
+//            if (i <= 5) {
+//                binding.progressbar.setProgress(10)
+//                binding.textviewProcess.text = "${i}초"
+//                i += 1
+//                handler.postDelayed(this, 1000) // 1초 후 다시 실행
+//            }
+//            else{
+//                onFinished()
+//            }
+//        }
+//    }
+//    handler.post(runnable) // 최초 실행
+//}
 

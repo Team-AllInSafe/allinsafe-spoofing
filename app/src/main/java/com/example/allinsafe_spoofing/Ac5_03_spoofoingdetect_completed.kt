@@ -2,14 +2,19 @@ package com.example.allinsafe_spoofing
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.RecyclerView
 import com.example.allinsafe_spoofing.R
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.databinding.Ac503SpoofingdetectCompletedBinding
+import com.example.allinsafe_spoofing.databinding.Ac506SpofingdetectItemLogBinding
+import com.example.allinsafe_spoofing.detection.common.LogManager
 
 class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
     private lateinit var binding: Ac503SpoofingdetectCompletedBinding
@@ -17,38 +22,46 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
         super.onCreate(savedInstanceState)
         binding = Ac503SpoofingdetectCompletedBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val activity502=Ac5_02_spoofingdetect_process.activity502
+        val adapter =CompletedLogViewAdapter(LogManager.getLogs().toMutableList())
+        binding.recyclerLog.adapter=adapter
+//        LogManager.addObserver { updatedLogs ->
+//            adapter.updateLogs(updatedLogs)
+//            binding.recyclerLog.scrollToPosition(adapter.itemCount - 1)
+//        }
 
-//        //ui확인을 위한 임시 부분임
-        set_arp_normal(binding)
-        set_dns_normal(binding)
-        var arp_isnormal=true
-        var dns_isnormal=true
-        binding.arpBg.setOnClickListener {
-            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
-            if(arp_isnormal){
-                arp_isnormal=false
-                set_arp_abnormal(binding)
-            }
-            else{
-                arp_isnormal=true
-                set_arp_normal(binding)
-            }
-
-        }
-        binding.dnsView.setOnClickListener {
-            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
-            if(dns_isnormal){
-                dns_isnormal=false
-                set_dns_abnormal(binding)
-            }
-            else{
-                dns_isnormal=true
-                set_dns_normal(binding)
-            }
-        }
-//        //ui확인을 위한 임시 부분임
+////        //ui확인을 위한 임시 부분임
+//        set_arp_normal(binding)
+//        set_dns_normal(binding)
+//        var arp_isnormal=true
+//        var dns_isnormal=true
+//        binding.arpBg.setOnClickListener {
+//            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
+//            if(arp_isnormal){
+//                arp_isnormal=false
+//                set_arp_abnormal(binding)
+//            }
+//            else{
+//                arp_isnormal=true
+//                set_arp_normal(binding)
+//            }
+//
+//        }
+//        binding.dnsView.setOnClickListener {
+//            //ui확인을 위한 임시 함수로, 실제 ui적용시 삭제할 예정임
+//            if(dns_isnormal){
+//                dns_isnormal=false
+//                set_dns_abnormal(binding)
+//            }
+//            else{
+//                dns_isnormal=true
+//                set_dns_normal(binding)
+//            }
+//        }
+////        //ui확인을 위한 임시 부분임
 
         binding.backButton.setOnClickListener {
+            activity502?.finish()
             finish()
         }
         binding.btnShowDetectHistory.setOnClickListener {
@@ -68,6 +81,9 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
         else{
             set_dns_normal(binding)
         }
+//        fun multiFinish(){
+//            this@Ac5_03_spoofoingdetect_completed.finishAffinity()
+//        }
     }
     fun set_arp_normal(binding: Ac503SpoofingdetectCompletedBinding){
         binding.arpBg.background = ContextCompat.getDrawable(binding.root.context, R.drawable.btn_round_green)
@@ -84,5 +100,27 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
     fun set_dns_abnormal(binding: Ac503SpoofingdetectCompletedBinding){
         binding.dnsView.background = ContextCompat.getDrawable(binding.root.context, R.drawable.btn_round_red)
         binding.dnsText.text="탐지"
+    }
+}
+
+class CompletedLogViewHolder(var binding: Ac506SpofingdetectItemLogBinding): RecyclerView.ViewHolder(binding.root)
+class CompletedLogViewAdapter(private val LogList: MutableList<String>) :
+    RecyclerView.Adapter<LogViewHolder>() {
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
+        val binding= Ac506SpofingdetectItemLogBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        return LogViewHolder(binding)
+    }
+
+    override fun getItemCount(): Int = LogList.size
+
+    override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
+        val log=LogList[position]
+        holder.binding.recyclerLog.text=log
+    }
+    fun updateLogs(newLogs: List<String>) {
+        LogList.clear()
+        LogList.addAll(newLogs)
+        notifyDataSetChanged()
     }
 }
