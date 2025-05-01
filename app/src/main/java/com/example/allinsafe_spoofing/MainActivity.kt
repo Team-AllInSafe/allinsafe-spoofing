@@ -72,6 +72,8 @@ class MainActivity : ComponentActivity() {
 //                }
 //            }
 //        }
+
+
         val app=application as MyApp
         SpoofingDetectingStatusManager.init(this)
         binding=Ac501SpoofingdetectInitMainBinding.inflate(layoutInflater)
