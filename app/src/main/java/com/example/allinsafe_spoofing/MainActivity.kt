@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
         var insertDnsDummyPacket=false
 
         //이거 켜두면 탐지 초기 화면 들어오자마자 vpn권한 요청할 수 있음.
-        //startVpnService()
+        startVpnService()
 
         //dns, arp 탐지 과정을 위한 코드
 //        val app = application as AppClass
