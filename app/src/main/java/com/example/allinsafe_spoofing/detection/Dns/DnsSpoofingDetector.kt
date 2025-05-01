@@ -51,7 +51,8 @@ class DnsSpoofingDetector(
 
         if (!isResponse) {
             pendingRequests[txid] = sourceIp
-            Log.d(TAG, "[DNS Request Logged] TXID: $txid, 요청 서버: $sourceIp")
+            //Log.d(TAG, "[DNS Request Logged] TXID: $txid, 요청 서버: $sourceIp")
+            LogManager.log(TAG, "[DNS Request Logged] TXID: $txid, 요청 서버: $sourceIp")
             return
         }
 

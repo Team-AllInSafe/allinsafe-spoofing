@@ -33,7 +33,8 @@ class ArpSpoofingDetector(
         val expectedMac = knownMacTable[arpData.senderIp]
 
         return if (expectedMac != null && arpData.senderMac != expectedMac) {
-            Log.e(TAG, "🔥 [탐지됨] ${arpData.senderIp}: 예상 MAC=$expectedMac, 수신 MAC=${arpData.senderMac}")
+            //Log.e(TAG, "🔥 [탐지됨] ${arpData.senderIp}: 예상 MAC=$expectedMac, 수신 MAC=${arpData.senderMac}")
+            LogManager.log(TAG, "🔥 [탐지됨] ${arpData.senderIp}: 예상 MAC=$expectedMac, 수신 MAC=${arpData.senderMac}")
             alertManager.sendAlert(
                 severity = "CRITICAL",
                 title = "ARP 스푸핑 감지",
@@ -42,7 +43,8 @@ class ArpSpoofingDetector(
             SpoofingDetectingStatusManager.arpSpoofingCompleted("CRITICAL")
             true
         } else {
-            Log.d(TAG, "[정상] ARP 패킷: ${arpData.senderIp} (${arpData.senderMac})")
+            //Log.d(TAG, "[정상] ARP 패킷: ${arpData.senderIp} (${arpData.senderMac})")
+            LogManager.log(TAG, "[정상] ARP 패킷: ${arpData.senderIp} (${arpData.senderMac})")
             false
         }
     }
@@ -100,6 +102,3 @@ class ArpSpoofingDetector(
         return arpMap
     }
 }
-=======
-}
-

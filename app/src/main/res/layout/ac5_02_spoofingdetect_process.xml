@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background"
     android:orientation="vertical">
     <LinearLayout
@@ -23,15 +24,45 @@
         android:textColor="@color/ui_beige"
         android:textSize="30dp"
         android:gravity="center"/>
-    <ProgressBar
-        android:id="@+id/progressbar"
-        android:layout_width="250dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        style="@style/Widget.AppCompat.ProgressBar"
-        android:progressDrawable="@drawable/bar_progress"
-        android:progressTint="@color/ui_green"/>
+        android:orientation="horizontal">
+        <ProgressBar
+            android:id="@+id/progressbar"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            style="@style/Widget.AppCompat.ProgressBar"
+            android:progressDrawable="@drawable/bar_progress"
+            android:progressTint="@color/ui_green"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/btn_arp_dummy_packet"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/ui_beige"
+                android:text="arp 더미 패킷 삽입"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
+            <TextView
+                android:id="@+id/btn_dns_dummy_packet"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/ui_beige"
+                android:text="dns 더미 패킷 삽입"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -46,13 +77,19 @@
         android:textColor="@color/ui_beige"
         android:background="@drawable/btn_round_blue"
         android:layout_margin="20dp">
-        <TextView
-            android:id="@+id/textview_process"
+<!--        <TextView-->
+<!--            android:id="@+id/textview_process"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_margin="20dp"-->
+<!--            android:text="spoofing process init"-->
+<!--            android:textColor="@color/ui_beige"-->
+<!--            android:textSize="15dp"/>-->
+        <androidx.recyclerview.widget.RecyclerView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="20dp"
-            android:text="spoofing process init"
-            android:textColor="@color/ui_beige"
-            android:textSize="15dp"/>
+            android:id="@+id/recycler_log"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
     </LinearLayout>
 </LinearLayout>

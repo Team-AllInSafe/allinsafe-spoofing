@@ -6,6 +6,7 @@ import com.example.allinsafe_spoofing.detection.common.AlertManager
 import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpData
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
+import com.example.allinsafe_spoofing.detection.common.LogManager
 import java.nio.ByteBuffer
 
 class SpoofingDetectionManager(
@@ -41,7 +42,8 @@ class SpoofingDetectionManager(
             val etherType = buffer.getShort(ethTypeOffset).toInt() and 0xFFFF
             etherType == 0x0806
         } catch (e: Exception) {
-            Log.e("SpoofingManager", "ARP 판별 실패: ${e.message}")
+            //Log.e("SpoofingManager", "ARP 판별 실패: ${e.message}")
+            LogManager.log("SpoofingManager", "ARP 판별 실패: ${e.message}")
             false
         }
     }
@@ -57,7 +59,8 @@ class SpoofingDetectionManager(
             else buffer.getShort(42).toInt() and 0xFFFF
             protocol == 17 && (srcPort == 53 || dstPort == 53)
         } catch (e: Exception) {
-            Log.e("SpoofingManager", "DNS 판별 실패: ${e.message}")
+            //Log.e("SpoofingManager", "DNS 판별 실패: ${e.message}")
+            LogManager.log("SpoofingManager", "DNS 판별 실패: ${e.message}")
             false
         }
     }
