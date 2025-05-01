@@ -37,6 +37,14 @@ class MainActivity : ComponentActivity() {
         var insertArpDummyPacket=false
         var insertDnsDummyPacket=false
 
+        //vpnservice
+//        val vpnIntent=VpnService.prepare(this)
+//        if(vpnIntent!=null){
+//            startActivityForResult(vpnIntent,VPN_REQUEST_CODE)
+//        }else{
+//            onVpnPermissionGranted()
+//        }
+
         //dns, arp 탐지 과정을 위한 코드
 //        val app = application as AppClass
 //        val sdsManager = (application as SpoofingDetectingStatusManager).also {
@@ -116,7 +124,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1000 && resultCode == RESULT_OK) {
-            //여기가 스푸핑 탐지 완료한 부분인가?
             val serviceIntent = Intent(this, CustomVpnService::class.java)
             startService(serviceIntent)
         }
