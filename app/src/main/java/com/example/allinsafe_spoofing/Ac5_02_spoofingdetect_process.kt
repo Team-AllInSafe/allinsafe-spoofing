@@ -37,6 +37,18 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
         activity502=this
         binding=Ac502SpoofingdetectProcessBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+//        val adapter=LogViewAdapter(listOf("로그1","로그2","로그3").toMutableList())
+//        binding.recyclerLog.adapter=adapter
+
+        val adapter =LogViewAdapter(LogManager.getLogs().toMutableList())
+        binding.recyclerLog.adapter=adapter
+        // ✅ 옵저버 등록해서 로그가 추가될 때마다 RecyclerView 갱신
+        LogManager.addObserver { updatedLogs ->
+            adapter.updateLogs(updatedLogs)
+            binding.recyclerLog.scrollToPosition(adapter.itemCount - 1) // 마지막 로그로 스크롤
+        }
+
         binding.backButton.setOnClickListener {
             finish()
         }
@@ -45,9 +57,9 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
 //        }
         binding.progressbar.setProgress(1)
 //      binding.textviewProcess.text="검사중..."
-        val adapter =LogViewAdapter(LogManager.getLogs())
-        binding.recyclerLog.adapter=adapter
+
         binding.btnArpDummyPacket.setOnClickListener {
+            LogManager.log("DEBUG", "ARP 더미 패킷 버튼 클릭됨")
             DummyPacketInjector.injectDummyArpData()
         }
         binding.btnDnsDummyPacket.setOnClickListener {
@@ -91,7 +103,7 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
     }
 }
 class LogViewHolder(var binding: Ac506SpofingdetectItemLogBinding): RecyclerView.ViewHolder(binding.root)
-class LogViewAdapter(private val LogList: List<String>) :
+class LogViewAdapter(private val LogList: MutableList<String>) :
 RecyclerView.Adapter<LogViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
@@ -104,6 +116,11 @@ RecyclerView.Adapter<LogViewHolder>() {
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         val log=LogList[position]
         holder.binding.recyclerLog.text=log
+    }
+    fun updateLogs(newLogs: List<String>) {
+        LogList.clear()
+        LogList.addAll(newLogs)
+        notifyDataSetChanged()
     }
 }
 

@@ -25,10 +25,10 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
         val activity502=Ac5_02_spoofingdetect_process.activity502
         val adapter =CompletedLogViewAdapter(LogManager.getLogs().toMutableList())
         binding.recyclerLog.adapter=adapter
-//        LogManager.addObserver { updatedLogs ->
-//            adapter.updateLogs(updatedLogs)
-//            binding.recyclerLog.scrollToPosition(adapter.itemCount - 1)
-//        }
+        LogManager.addObserver { updatedLogs ->
+            adapter.updateLogs(updatedLogs)
+            binding.recyclerLog.scrollToPosition(adapter.itemCount - 1)
+        }
 
 ////        //ui확인을 위한 임시 부분임
 //        set_arp_normal(binding)
