@@ -1,5 +1,7 @@
 package com.example.allinsafe_spoofing.detection
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager

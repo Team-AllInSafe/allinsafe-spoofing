@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -17,19 +18,20 @@ import com.example.allinsafe_spoofing.databinding.Ac506SpofingdetectItemLogBindi
 import com.example.allinsafe_spoofing.detection.common.LogManager
 
 class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
+    lateinit var activity502:Ac5_02_spoofingdetect_process
     private lateinit var binding: Ac503SpoofingdetectCompletedBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = Ac503SpoofingdetectCompletedBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val activity502=Ac5_02_spoofingdetect_process.activity502
+        activity502= Ac5_02_spoofingdetect_process.activity502!!
         val adapter =CompletedLogViewAdapter(LogManager.getLogs().toMutableList())
         binding.recyclerLog.adapter=adapter
         LogManager.addObserver { updatedLogs ->
             adapter.updateLogs(updatedLogs)
             binding.recyclerLog.scrollToPosition(adapter.itemCount - 1)
         }
-
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
 ////        //ui확인을 위한 임시 부분임
 //        set_arp_normal(binding)
 //        set_dns_normal(binding)
@@ -68,6 +70,7 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
             var intent = Intent(this, Ac5_04_spoofingdetect_detect_history::class.java)
             startActivity(intent)
         }
+
         if (SpoofingDetectingStatusManager.getArpSeverity() == "CRITICAL"
             || SpoofingDetectingStatusManager.getArpSeverity()=="WARNING") {
             set_arp_abnormal(binding)
@@ -84,6 +87,13 @@ class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
 //        fun multiFinish(){
 //            this@Ac5_03_spoofoingdetect_completed.finishAffinity()
 //        }
+    }
+    private val onBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            // 뒤로가기 실행시 실행할 동작코드 구현하기! (앱종료, 다이얼로그 띄우기 등등)
+          activity502?.finish()
+            finish()
+        }
     }
     fun set_arp_normal(binding: Ac503SpoofingdetectCompletedBinding){
         binding.arpBg.background = ContextCompat.getDrawable(binding.root.context, R.drawable.btn_round_green)

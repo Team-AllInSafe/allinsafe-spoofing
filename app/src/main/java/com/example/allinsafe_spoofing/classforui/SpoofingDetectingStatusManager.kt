@@ -2,6 +2,8 @@ package com.example.allinsafe_spoofing.classforui
 
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import com.example.allinsafe_spoofing.Ac5_03_spoofoingdetect_completed
@@ -33,10 +35,11 @@ object SpoofingDetectingStatusManager {
         if (arpSpoofDetectResult.getStatus() == 2 && dnsSpoofDetectResult.getStatus() == 2) {
             Log.d("ui","스푸핑 둘 다 완료됨")
             // 두 탐지 모두 완료됨 -> 다음 액티비티로 이동
-            val intent = Intent(context, Ac5_03_spoofoingdetect_completed::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // context가 Activity가 아닐 수 있으므로
-            completedPageStart()
-            context.startActivity(intent)
+                val intent = Intent(context, Ac5_03_spoofoingdetect_completed::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // context가 Activity가 아닐 수 있으므로
+                completedPageStart()
+                context.startActivity(intent)
+
             Log.d("ui","503액티비티 출력")
         }
     }
