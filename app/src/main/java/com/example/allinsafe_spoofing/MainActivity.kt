@@ -37,13 +37,8 @@ class MainActivity : ComponentActivity() {
         var insertArpDummyPacket=false
         var insertDnsDummyPacket=false
 
-        //vpnservice
-//        val vpnIntent=VpnService.prepare(this)
-//        if(vpnIntent!=null){
-//            startActivityForResult(vpnIntent,VPN_REQUEST_CODE)
-//        }else{
-//            onVpnPermissionGranted()
-//        }
+        //이거 켜두면 탐지 초기 화면 들어오자마자 vpn권한 요청할 수 있음.
+        //startVpnService()
 
         //dns, arp 탐지 과정을 위한 코드
 //        val app = application as AppClass
@@ -85,6 +80,8 @@ class MainActivity : ComponentActivity() {
             //탐지중 패킷 추가 위한 작업
             DummyPacketInjector.arp_init(detectionManager.arpDetector)
             DummyPacketInjector.dns_init(detectionManager.dnsDetector)
+
+            //설마?
 
             startVpnService()
             if(insertArpDummyPacket){
