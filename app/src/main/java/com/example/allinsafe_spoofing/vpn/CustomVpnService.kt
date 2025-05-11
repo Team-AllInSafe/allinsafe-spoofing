@@ -3,14 +3,11 @@ package com.example.allinsafe_spoofing.vpn
 import android.content.Intent
 import android.net.VpnService
 import android.os.*
-import android.util.Log
-import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
-import com.example.allinsafe_spoofing.databinding.Ac502SpoofingdetectProcessBinding
 import com.example.allinsafe_spoofing.detection.SpoofingDetectionManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
-import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
 import com.example.allinsafe_spoofing.detection.common.LogManager
+import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 
@@ -21,10 +18,7 @@ class CustomVpnService : VpnService() {
     private var detectionManager: SpoofingDetectionManager? = null
     private val buffer = ByteBuffer.allocate(32767)
 
-
-
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        //Log.i("VPN", "VPN 서비스 시작 요청")
         LogManager.log("VPN", "VPN 서비스 시작 요청")
         startVpnSafely()
         return START_STICKY
@@ -41,19 +35,15 @@ class CustomVpnService : VpnService() {
                 .establish()
 
             if (fd == null) {
-                //Log.e("VPN", "VPN 인터페이스 생성 실패")
                 LogManager.log("VPN", "VPN 인터페이스 생성 실패")
                 stopSelf()
                 return
             }
 
             vpnInterface = fd
-            //Log.i("VPN", "VPN 인터페이스 설정 완료")
             LogManager.log("VPN", "VPN 인터페이스 설정 완료")
 
-            // 1) AlertManager
             val alertManager = AlertManager()
-            // 2) ARP / DNS 디텍터 생성
             val arpDetector = ArpSpoofingDetector(alertManager)
             val dnsDetector = DnsSpoofingDetector(alertManager)
 
@@ -63,41 +53,35 @@ class CustomVpnService : VpnService() {
                 alertManager = alertManager
             )
 
-            //startArpMonitoring()
-
             Handler(Looper.getMainLooper()).postDelayed({
                 if (vpnInterface != null) {
-                    //Log.i("VPN", "인터페이스 안정화 완료, 패킷 캡처 시작")
                     LogManager.log("VPN", "인터페이스 안정화 완료, 패킷 캡처 시작")
                     startPacketCapture()
                 }
             }, 300)
 
         } catch (e: Exception) {
-            //Log.e("VPN", "VPN 시작 중 오류: ${e.message}")
             LogManager.log("VPN", "VPN 시작 중 오류: ${e.message}")
             stopSelf()
         }
     }
-
-
-    /*
-    루팅 후 가능한 arp 모니터링 기능
-    private fun startArpMonitoring() {
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = object : Runnable {
-            override fun run() {
-                detectionManager?.arpDetector?.checkArpTable()
-                handler.postDelayed(this, 3000)
+        /*
+        루팅 후 가능한 arp 모니터링 기능
+        private fun startArpMonitoring() {
+            val handler = Handler(Looper.getMainLooper())
+            val runnable = object : Runnable {
+                override fun run() {
+                    detectionManager?.arpDetector?.checkArpTable()
+                    handler.postDelayed(this, 3000)
+                }
             }
+            handler.post(runnable)
         }
-        handler.post(runnable)
-    }
-*/
+    */
+
 
     private fun startPacketCapture() {
         if (isCapturing) {
-            //Log.w("VPN", "이미 캡처 중")
             LogManager.log("VPN", "이미 캡처 중")
             return
         }
@@ -107,18 +91,17 @@ class CustomVpnService : VpnService() {
             try {
                 val fd = vpnInterface?.fileDescriptor ?: return@Thread
                 val inputStream = FileInputStream(fd)
-                //Log.i("VPN", "패킷 캡처 스레드 시작")
                 LogManager.log("VPN", "패킷 캡처 스레드 시작")
 
                 while (isCapturing) {
                     val length = inputStream.read(buffer.array())
                     if (length > 0) {
+                        // ✅ uplink + downlink 모두 analyzePacket으로 전달
                         val packetData = buffer.array().copyOf(length)
                         detectionManager?.analyzePacket(packetData)
                     }
                 }
             } catch (e: Exception) {
-                //Log.e("VPN", "캡처 중 오류: ${e.message}")
                 LogManager.log("VPN", "캡처 중 오류: ${e.message}")
             }
         }
@@ -135,16 +118,18 @@ class CustomVpnService : VpnService() {
         stopPacketCapture()
         vpnInterface?.close()
         vpnInterface = null
-        //Log.i("VPN", "VPN 인터페이스 종료")
         LogManager.log("VPN", "VPN 인터페이스 종료")
     }
 
     override fun onDestroy() {
         super.onDestroy()
         stopVpn()
-        //Log.i("VPN", "VPN 서비스 종료")
         LogManager.log("VPN", "VPN 서비스 종료")
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
 }
+
+
+
+
