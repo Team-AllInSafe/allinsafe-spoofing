@@ -17,7 +17,8 @@ import com.example.allinsafe_spoofing.databinding.Ac503SpoofingdetectCompletedBi
 import com.example.allinsafe_spoofing.databinding.Ac506SpofingdetectItemLogBinding
 import com.example.allinsafe_spoofing.detection.common.LogManager
 
-class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
+
+class Ac5_03_spoofingdetect_completed : ComponentActivity() {
     lateinit var activity502:Ac5_02_spoofingdetect_process
     private lateinit var binding: Ac503SpoofingdetectCompletedBinding
     override fun onCreate(savedInstanceState: Bundle?) {
