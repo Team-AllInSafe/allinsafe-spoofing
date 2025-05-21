@@ -98,7 +98,7 @@ class Ac5_02_spoofingdetect_process : ComponentActivity() {
 
         //실제 스푸핑 코드와 연동하였을때 사용하기 위한 함수
         Toast.makeText(this.applicationContext,"스푸핑 탐지가 완료되었습니다!",Toast.LENGTH_LONG).show()
-        var intent=Intent(this,Ac5_03_spoofoingdetect_completed::class.java)
+        var intent=Intent(this,Ac5_03_spoofingdetect_completed::class.java)
         startActivity(intent)
     }
 }
