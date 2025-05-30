@@ -107,6 +107,8 @@ class CustomVpnService : VpnService() {
 
                         // ✅ 동시에 기존 방식도 유지
                         detectionManager?.analyzePacket(packetData)
+
+                        detectionManager?.startDetection(packetData)
                     }
                 }
             } catch (e: Exception) {

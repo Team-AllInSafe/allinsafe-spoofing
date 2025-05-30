@@ -35,7 +35,7 @@
         <activity android:name=".Ac5_02_spoofingdetect_process"
             android:exported="false"
             android:taskAffinity="com.ui.multiFinish"/>
-        <activity android:name=".Ac5_03_spoofoingdetect_completed"
+        <activity android:name=".Ac5_03_spoofingdetect_completed"
             android:exported="false"
             android:taskAffinity="com.ui.multiFinish"/>
         <activity android:name=".Ac5_04_spoofingdetect_detect_history"

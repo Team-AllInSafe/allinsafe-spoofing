@@ -43,6 +43,13 @@ object SpoofingDetectingStatusManager {
             Log.d("ui","503액티비티 출력")
         }
     }
+    fun spoofingEnd(){
+        val intent = Intent(context, Ac5_03_spoofingdetect_completed::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // context가 Activity가 아닐 수 있으므로
+        completedPageStart()
+        context.startActivity(intent)
+
+    }
     fun completedPageStart(){
         isCompletedPageStart=true
     }

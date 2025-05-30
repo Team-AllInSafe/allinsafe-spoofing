@@ -1,7 +1,11 @@
 package com.example.allinsafe_spoofing.detection
 
+import android.content.Intent
 import android.util.Log
+import com.example.allinsafe_spoofing.Ac5_03_spoofingdetect_completed
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager.completedPageStart
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager.spoofingEnd
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpData
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
 import com.example.allinsafe_spoofing.detection.common.AlertManager
@@ -18,9 +22,10 @@ class SpoofingDetectionManager(
     private val detectionTimeoutMillis = 5_000L // 5초 제한
     private var detectionStartTime: Long = 0
 
-    fun startDetection(packetSource: () -> ByteArray?) {
+    fun startDetection(packetSource: ByteArray) {
+//        packetSource: () -> ByteArray?
         if (isDetecting) {
-            Log.d("SpoofingManager", "탐지 중복 방지: 이미 실행 중")
+            //Log.d("SpoofingManager", "탐지 중복 방지: 이미 실행 중")
             return
         }
 
@@ -31,17 +36,26 @@ class SpoofingDetectionManager(
         Thread {
             while (isDetecting) {
                 val elapsed = System.currentTimeMillis() - detectionStartTime
+                //Log.d("spoofing_count","$elapsed 초 경과")
                 if (elapsed >= detectionTimeoutMillis) {
+
                     stopDetection()
-                    break
+                    //break
+                    spoofingEnd()
+                    //?
+                    if (!isDetecting)
+                    isDetecting = false
+                    LogManager.log("SpoofingManager", "탐지 종료")
+                    
                 }
 
-                val packetData = packetSource()
+                val packetData = packetSource
                 if (packetData != null) {
                     analyzePacket(packetData)
                 }
 
                 Thread.sleep(100) // 탐지 간격 (CPU 과부하 방지)
+
             }
         }.start()
     }
