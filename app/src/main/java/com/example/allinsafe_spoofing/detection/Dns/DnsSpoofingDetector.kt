@@ -1,7 +1,5 @@
 package com.example.allinsafe_spoofing.detection.dns
 
-import android.util.Log
-import com.example.allinsafe_spoofing.Ac5_02_spoofingdetect_process
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.detection.common.AlertManager
 import com.example.allinsafe_spoofing.detection.common.LogManager
@@ -21,10 +19,13 @@ class DnsSpoofingDetector(
         "2606:4700:4700::1111", "2606:4700:4700::1001"
     )
 
-    // 🔓 외부 접근 허용
-    val pendingRequests = ConcurrentHashMap<Int, String>()
-
+    private val pendingRequests = ConcurrentHashMap<Int, String>()
     private val warnedTxids = mutableSetOf<Int>()
+
+    // ✅ 테스트용 dummy request 삽입 (DummyPacketInjector에서 사용)
+    fun addDummyRequest(txid: Int, ip: String) {
+        pendingRequests[txid] = ip
+    }
 
     fun processPacket(buffer: ByteBuffer) {
         if (buffer.remaining() < 40) return
@@ -49,62 +50,62 @@ class DnsSpoofingDetector(
         val flags = buffer.short.toInt() and 0xFFFF
         val isResponse = (flags and 0x8000) != 0
 
+        // ✅ Request → 최초 1회만 기록
         if (!isResponse) {
-            pendingRequests[txid] = sourceIp
-            //Log.d(TAG, "[DNS Request Logged] TXID: $txid, 요청 서버: $sourceIp")
-            LogManager.log(TAG, "[DNS Request Logged] TXID: $txid, 요청 서버: $sourceIp")
+            if (!pendingRequests.containsKey(txid)) {
+                pendingRequests[txid] = sourceIp
+                LogManager.log(TAG, "[DNS Request Logged] TXID: $txid, 요청 서버: $sourceIp")
+            }
             return
         }
 
+        LogManager.log(TAG, "[DNS Response Logged] TXID: $txid, 응답 서버: $sourceIp")
+
         var failedChecks = 0
 
-        // ✅ 1. TXID 요청-응답 매칭 검사
         val expectedServer = pendingRequests[txid]
-        if (expectedServer == null || expectedServer != sourceIp) {
+        if (expectedServer == null) {
+            LogManager.log(TAG, "[TXID 검사 실패] TXID: $txid 는 등록되지 않은 요청입니다.")
+            failedChecks++
+        } else if (expectedServer != sourceIp) {
+            LogManager.log(TAG, "[TXID 불일치] 요청: $expectedServer / 응답: $sourceIp")
             failedChecks++
         }
 
-        // ✅ 2. TTL 값 검사
-        val ttl = if (version == 4) {
-            buffer.position(8)
-            buffer.get().toInt() and 0xFF
-        } else {
-            buffer.position(7)
-            buffer.get().toInt() and 0xFF
-        }
-        if (ttl < 10) {
-            failedChecks++
+        val ttl = try {
+            if (version == 4) {
+                buffer.position(8)
+                buffer.get().toInt() and 0xFF
+            } else {
+                buffer.position(7)
+                buffer.get().toInt() and 0xFF
+            }
+        } catch (e: Exception) {
+            -1
         }
 
-        // ✅ 3. 신뢰된 DNS 서버 검사
+        LogManager.log(TAG, "[TTL] 값: $ttl")
+        if (ttl in 1..<10) failedChecks++
+
         if (sourceIp !in trustedDnsServers) {
+            LogManager.log(TAG, "[신뢰되지 않은 DNS 서버] $sourceIp")
             failedChecks++
         }
 
-        // 중복 경고 방지
-        if ((failedChecks == 2 || failedChecks == 3) && txid in warnedTxids) return
-        if (failedChecks >= 2) warnedTxids.add(txid)
+        val alreadyWarned = txid in warnedTxids
+        if (failedChecks >= 2 && !alreadyWarned) {
+            warnedTxids.add(txid)
+        }
 
         logResult(sourceIp, txid, failedChecks)
     }
 
     private fun logResult(sourceIp: String, txid: Int, failedChecks: Int) {
-        SpoofingDetectingStatusManager.dnsSpoofingCompleted("severity")
-//        when (failedChecks) {
-//            0, 1 -> Log.d(TAG, "[OK] 정상적인 DNS 응답 (출처: $sourceIp, TXID: $txid)")
-//            2 -> {
-//                Log.w(TAG, "[WARNING] DNS 스푸핑 의심 (출처: $sourceIp, TXID: $txid)")
-//                alertManager.sendAlert("WARNING", "DNS 스푸핑 의심", "출처: $sourceIp, TXID: $txid")
-//            }
-//            3 -> {
-//                Log.e(TAG, "[CRITICAL] 🚨🚨 DNS 스푸핑 감지 (출처: $sourceIp, TXID: $txid)")
-//                alertManager.sendAlert("CRITICAL", "DNS 스푸핑 감지", "출처: $sourceIp, TXID: $txid")
-//            }
-//
-//        }
         when (failedChecks) {
-            0, 1 -> {LogManager.log(TAG, "[OK] 정상적인 DNS 응답 (출처: $sourceIp, TXID: $txid)")
-                SpoofingDetectingStatusManager.dnsSpoofingCompleted("OK")}
+            0, 1 -> {
+                LogManager.log(TAG, "[OK] 정상적인 DNS 응답 (출처: $sourceIp, TXID: $txid)")
+                SpoofingDetectingStatusManager.dnsSpoofingCompleted("OK")
+            }
             2 -> {
                 LogManager.log(TAG, "[WARNING] DNS 스푸핑 의심 (출처: $sourceIp, TXID: $txid)")
                 alertManager.sendAlert("WARNING", "DNS 스푸핑 의심", "출처: $sourceIp, TXID: $txid")
@@ -115,8 +116,6 @@ class DnsSpoofingDetector(
                 alertManager.sendAlert("CRITICAL", "DNS 스푸핑 감지", "출처: $sourceIp, TXID: $txid")
                 SpoofingDetectingStatusManager.dnsSpoofingCompleted("CRITICAL")
             }
-
         }
-        //SpoofingDetectingStatusManager.dnsSpoofingCompleted("severity")
     }
 }
