@@ -3,14 +3,11 @@ package com.example.allinsafe_spoofing
 import android.content.Intent
 import android.net.VpnService
 import android.os.Bundle
+import android.os.RemoteException
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import com.example.allinsafe_spoofing.classforui.MyApp
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.databinding.Ac501SpoofingdetectInitMainBinding
@@ -20,7 +17,6 @@ import com.example.allinsafe_spoofing.detection.common.AlertManager
 import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import com.example.allinsafe_spoofing.detection.packettest.DummyPacketInjector
 import com.example.allinsafe_spoofing.vpn.CustomVpnService
-import com.example.allinsafe_spoofing.ui.theme.AllinSafe_SpoofingTheme
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: Ac501SpoofingdetectInitMainBinding
@@ -38,7 +34,7 @@ class MainActivity : ComponentActivity() {
         var insertDnsDummyPacket=false
 
         //이거 켜두면 탐지 초기 화면 들어오자마자 vpn권한 요청할 수 있음.
-        startVpnService()
+        //startVpnService()
 
         //dns, arp 탐지 과정을 위한 코드
 //        val app = application as AppClass
@@ -81,9 +77,6 @@ class MainActivity : ComponentActivity() {
             DummyPacketInjector.arp_init(detectionManager.arpDetector)
             DummyPacketInjector.dns_init(detectionManager.dnsDetector)
 
-            //설마?
-
-            startVpnService()
             if(insertArpDummyPacket){
                 DummyPacketInjector.injectDummyArpData(detectionManager.arpDetector)
             }
@@ -92,8 +85,10 @@ class MainActivity : ComponentActivity() {
             }
             if(SpoofingDetectingStatusManager.getIsCompletedPageStart()==false){
                 //더미 패킷을 통해 스푸핑을 감지하면 너무 결과창이 빨리 나와 진행중 페이지에 덮여버리는것을 막는 조건문입니다.
-                var intent=Intent(this, Ac5_02_spoofingdetect_process::class.java)
-                startActivity(intent)
+//                이전 코드
+//                var intent=Intent(this, Ac5_02_spoofingdetect_process::class.java)
+//                startActivity(intent)
+                startVpnService()
                 //finish() //필요한지 모르겟음
         }
 
@@ -114,17 +109,22 @@ class MainActivity : ComponentActivity() {
 
     private fun startVpnService() {
         val intent = VpnService.prepare(this)
+        //기존 코드
         if (intent != null) {
             startActivityForResult(intent, 1000)
         } else {
             onActivityResult(1000, RESULT_OK, null)
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 1000 && resultCode == RESULT_OK) {
             val serviceIntent = Intent(this, CustomVpnService::class.java)
             startService(serviceIntent)
+
+            var intent=Intent(this, Ac5_02_spoofingdetect_process::class.java)
+            startActivity(intent)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
