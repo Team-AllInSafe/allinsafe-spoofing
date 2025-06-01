@@ -1,14 +1,16 @@
 package com.example.allinsafe_spoofing.detection
 
-import android.os.Handler
-import android.os.Looper
+import android.content.Intent
 import android.util.Log
+import com.example.allinsafe_spoofing.Ac5_03_spoofingdetect_completed
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
-import com.example.allinsafe_spoofing.detection.common.AlertManager
-import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager.completedPageStart
+import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager.spoofingEnd
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpData
 import com.example.allinsafe_spoofing.detection.arpdetector.ArpSpoofingDetector
+import com.example.allinsafe_spoofing.detection.common.AlertManager
 import com.example.allinsafe_spoofing.detection.common.LogManager
+import com.example.allinsafe_spoofing.detection.dns.DnsSpoofingDetector
 import java.nio.ByteBuffer
 
 class SpoofingDetectionManager(
@@ -16,17 +18,67 @@ class SpoofingDetectionManager(
     val dnsDetector: DnsSpoofingDetector,
     private val alertManager: AlertManager
 ) {
+    private var isDetecting = false
+    private val detectionTimeoutMillis = 5_000L // 5초 제한
+    private var detectionStartTime: Long = 0
+
+    fun startDetection(packetSource: ByteArray) {
+//        packetSource: () -> ByteArray?
+        if (isDetecting) {
+            //Log.d("SpoofingManager", "탐지 중복 방지: 이미 실행 중")
+            return
+        }
+
+        isDetecting = true
+        detectionStartTime = System.currentTimeMillis()
+        LogManager.log("SpoofingManager", "탐지 시작")
+
+        Thread {
+            while (isDetecting) {
+                val elapsed = System.currentTimeMillis() - detectionStartTime
+                //Log.d("spoofing_count","$elapsed 초 경과")
+                if (elapsed >= detectionTimeoutMillis) {
+
+                    stopDetection()
+                    //break
+                    spoofingEnd()
+                    //?
+                    if (!isDetecting)
+                    isDetecting = false
+                    LogManager.log("SpoofingManager", "탐지 종료")
+                    
+                }
+
+                val packetData = packetSource
+                if (packetData != null) {
+                    analyzePacket(packetData)
+                }
+
+                Thread.sleep(100) // 탐지 간격 (CPU 과부하 방지)
+
+            }
+        }.start()
+    }
+
+    fun stopDetection() {
+        if (!isDetecting) return
+        isDetecting = false
+        LogManager.log("SpoofingManager", "탐지 종료")
+    }
+
+    fun isDetectionRunning(): Boolean = isDetecting
+
     fun analyzePacket(packetData: ByteArray) {
         val buffer = ByteBuffer.wrap(packetData)
 
         if (isArpPacket(buffer)) {
             val arpData = ArpData.fromPacket(packetData)
             val isSpoofed = arpData != null && arpDetector.analyzePacket(arpData)
-            if (isSpoofed && arpData != null) {
+            if (isSpoofed) {
                 alertManager.sendAlert(
                     severity = "CRITICAL",
                     title = "ARP 스푸핑 감지",
-                    message = "IP: ${arpData.senderIp}, 변조된 MAC: ${arpData.senderMac}"
+                    message = "IP: ${arpData!!.senderIp}, 변조된 MAC: ${arpData.senderMac}"
                 )
                 SpoofingDetectingStatusManager.arpSpoofingCompleted("CRITICAL")
             }
@@ -44,24 +96,20 @@ class SpoofingDetectionManager(
             val etherType = buffer.getShort(ethTypeOffset).toInt() and 0xFFFF
             etherType == 0x0806
         } catch (e: Exception) {
-            //Log.e("SpoofingManager", "ARP 판별 실패: ${e.message}")
             LogManager.log("SpoofingManager", "ARP 판별 실패: ${e.message}")
             false
         }
     }
+
     private fun isDnsPacket(buffer: ByteBuffer): Boolean {
         return try {
             buffer.rewind()
             val version = (buffer.get(0).toInt() shr 4) and 0xF
-            val protocol = if (version == 4) buffer.get(9).toInt() and 0xFF
-            else buffer.get(6).toInt() and 0xFF
-            val srcPort = if (version == 4) buffer.getShort(20).toInt() and 0xFFFF
-            else buffer.getShort(40).toInt() and 0xFFFF
-            val dstPort = if (version == 4) buffer.getShort(22).toInt() and 0xFFFF
-            else buffer.getShort(42).toInt() and 0xFFFF
+            val protocol = if (version == 4) buffer.get(9).toInt() and 0xFF else buffer.get(6).toInt() and 0xFF
+            val srcPort = if (version == 4) buffer.getShort(20).toInt() and 0xFFFF else buffer.getShort(40).toInt() and 0xFFFF
+            val dstPort = if (version == 4) buffer.getShort(22).toInt() and 0xFFFF else buffer.getShort(42).toInt() and 0xFFFF
             protocol == 17 && (srcPort == 53 || dstPort == 53)
         } catch (e: Exception) {
-            //Log.e("SpoofingManager", "DNS 판별 실패: ${e.message}")
             LogManager.log("SpoofingManager", "DNS 판별 실패: ${e.message}")
             false
         }

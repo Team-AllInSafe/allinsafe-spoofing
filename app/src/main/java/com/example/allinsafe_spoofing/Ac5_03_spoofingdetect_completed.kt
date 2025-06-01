@@ -6,18 +6,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.enableEdgeToEdge
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
-import com.example.allinsafe_spoofing.R
 import com.example.allinsafe_spoofing.classforui.SpoofingDetectingStatusManager
 import com.example.allinsafe_spoofing.databinding.Ac503SpoofingdetectCompletedBinding
 import com.example.allinsafe_spoofing.databinding.Ac506SpofingdetectItemLogBinding
 import com.example.allinsafe_spoofing.detection.common.LogManager
 
-class Ac5_03_spoofoingdetect_completed : ComponentActivity() {
+
+class Ac5_03_spoofingdetect_completed : ComponentActivity() {
     lateinit var activity502:Ac5_02_spoofingdetect_process
     private lateinit var binding: Ac503SpoofingdetectCompletedBinding
     override fun onCreate(savedInstanceState: Bundle?) {
